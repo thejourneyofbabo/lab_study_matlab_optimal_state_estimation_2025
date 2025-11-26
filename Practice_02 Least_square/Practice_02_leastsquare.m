@@ -22,13 +22,13 @@ H = zeros(sim_total_steps ,Num_of_state);
 
 for idxSim = 1: sim_total_steps
     % ToDo
-    % H(idxSim,:) = XXXXXX ;
+    H(idxSim,:) = [1, sim_time(idxSim),(1/2)*sim_time(idxSim)^2] ;
 
 end
 
 % Calculate estimated value
 % ToDo
-% x_ls = XXXXXX ;    
+x_ls = (H'*H)^(-1)*H'*sim_altitude_sensor;    
 error_ls = abs(x_ls-sim_true);
 
 fprintf('[Practice 1] \n');
@@ -51,7 +51,7 @@ P0 = [100  0   0;
        0   0  100];
 x0 = [0 0 0]';
 % ToDo
-% R = XXX ;
+R=0.01;
 
 isFirstStep = true;
 for idxSim = 1: sim_total_steps
@@ -68,9 +68,10 @@ for idxSim = 1: sim_total_steps
     end
     
     % ToDo
-    % K = XXXXXX ;
-    % x_rls(:,idxSim) = XXXXXX ;
-    % P_rls{idxSim} = XXXXXX ;
+    H_k = H(idxSim,:);
+    K = P_rls{idxSim-1}*H_k' * (H_k*P_rls{idxSim-1}*H_k'+R)^(-1) ;
+    x_rls(:,idxSim) = x_rls(:,idxSim-1) + K*(sim_altitude_sensor(idxSim)-H_k*x_rls(:,idxSim-1)) ;
+    P_rls{idxSim} = (eye(Num_of_state)-K*H_k) * P_rls{idxSim-1} * (eye(Num_of_state)-K*H_k)'+K*R*K' ;
            
 end
 

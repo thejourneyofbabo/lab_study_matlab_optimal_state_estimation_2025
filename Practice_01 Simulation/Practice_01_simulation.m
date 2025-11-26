@@ -46,23 +46,28 @@ for idxSim = 1 : sim_total_steps
     %%%% TODO %%%%
     sim_acceleration( idxSim ) = sim_acceleration(idxSim - 1) ;
     sim_velocity( idxSim ) = sim_velocity(idxSim -1) + sim_acceleration(idxSim -1)*delta_t ;
-    sim_altitude( idxSim ) = sim_altitude(idxSim -1 ) + sim_velocity(idxSim - 1) * delta_t * + (1/2)*sim_acceleration(idxSim -1)*delta_t*delta_t ;
+    sim_altitude( idxSim ) = sim_altitude(idxSim -1 ) + sim_velocity(idxSim - 1)*delta_t + (1/2)*sim_acceleration(idxSim -1)*delta_t*delta_t ;
     
 end
 
 % Plot
-figure('Name','Practice 1','Position',[100,100,840,630]);
+figure('Name','Practice 1', 'Position',[100,100,840,630]);
 
 hold on; 
 
-subplot(2,1,1)
+subplot(3,1,1)
 plot(sim_time, sim_altitude, 'r');
 legend('altitude'); xlabel('time[s]'); ylabel('altitude[m]'); grid on;
 
-subplot(2,1,2)
+subplot(3,1,2)
 plot(sim_time, sim_velocity, 'b');
 legend('velocity');
 xlabel('time[s]'); ylabel('velocity [m/s]'); grid on;
+
+subplot(3,1,3)
+plot(sim_time, sim_acceleration, 'b');
+legend('acceleration');
+xlabel('time[s]'); ylabel('acceleration [m/s^2]'); grid on;
 
 hold off
 
@@ -78,7 +83,7 @@ sim_altitude_sensor = zeros(sim_total_steps ,1);
 for idxSim = 1 : sim_total_steps 
 
     %%%% TODO %%%%
-    % sim_altitude_sensor(idxSim) = XXXXX ;
+    sim_altitude_sensor(idxSim) = normrnd(sim_altitude(idxSim),altitude_sensor_std);
 
 end
 
