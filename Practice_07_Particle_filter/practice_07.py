@@ -382,3 +382,28 @@ print(f"RMSE Heading: {np.degrees(rmse_psi):.4f} deg ({rmse_psi:.4f} rad)")
 print(f"\nProcess Noise Q diagonal: {np.sqrt(np.diag(Q))}")
 print(f"Measurement Noise R diagonal: {np.sqrt(np.diag(R))}")
 print("="*60)
+
+
+"""
+필터 성능 비교 분석
+
+1. 비교 대상:
+   - EKF with Constant Velocity Model
+   - EKF with Dead Reckoning Model
+   - Particle Filter with Dead Reckoning Model
+
+2. 위치 정확도 (낮을수록 좋음):
+   - EKF + Dead Reckoning: 0.7922 m (가장 우수)
+   - PF + Dead Reckoning: 약 0.86 m (근소한 차이)
+   - EKF + Constant Velocity: 1.7351 m (가장 낮음)
+   
+3. 헤딩 정확도:
+   - Particle Filter: 1.7511도 (가장 우수)
+   - EKF with Dead Reckoning: 3.9396도 (2배 이상 오차)
+
+4. 핵심 결론:
+   - Dead Reckoning 모델이 Constant Velocity보다 약 2배 더 정확
+   - 위치 추정: EKF가 약간 우세
+   - 헤딩 추정: PF가 2배 이상 우세
+   - 실제 제어 입력(속도, 요레이트)을 사용하는 모델이 훨씬 정확함
+"""
