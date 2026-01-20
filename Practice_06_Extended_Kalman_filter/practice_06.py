@@ -1004,3 +1004,147 @@ print(f"Heading RMSE         : {np.rad2deg(rmse_heading):.4f} degrees")
 print("-"*70)
 print(f"Total Position RMSE  : {rmse_position_total:.4f} m")
 print("="*70)
+
+"""
+-------------------------------------------------------------------------------
+Problem: Practice 3-4: P Matrix Visualization for Three Cases (DR Model)
+-------------------------------------------------------------------------------
+"""
+
+def run_ekf_dr(q_pos, q_heading, case_name):
+   n_states = 3
+   x_est = np.zeros((n_steps, n_states))
+   P_history = np.zeros((n_steps, n_states))
+
+   # Initial conditions
+   x_est[0] = np.array([0, 0, 0])
+   P = np.eye(n_states) * 10000
+   P_history[0] = np.diag(P)
+
+   # Process noise covariance Q 
+   Q = np.diag([q_pos**2, q_pos**2, q_heading**2])
+
+   # Measurement noise covariance R
+   R = np.array([[sigma_r**2, 0],
+                 [0, sigma_theta_rad**2]])
+   
+   # EKF loop
+   for k in range(n_steps - 1):
+      x_k = x_est[k]
+      px, py, psi_k = x_k
+      
+      V_k = input_v[k]
+      yawrate_k = input_yawrate[k]
+      
+      # Prediction
+      x_pred = np.array([
+         px + V_k * dT * np.cos(psi_k),
+         py + V_k * dT * np.sin(psi_k),
+         psi_k + dT * yawrate_k
+      ])
+      
+      F = np.array([
+         [1, 0, -V_k * dT * np.sin(psi_k)],
+         [0, 1,  V_k * dT * np.cos(psi_k)],
+         [0, 0,  1]
+      ])
+      
+      P_pred = F @ P @ F.T + Q
+      
+      # Measurement update
+      px_pred = x_pred[0]
+      py_pred = x_pred[1]
+      dist = np.sqrt(px_pred**2 + py_pred**2)
+      
+      if dist < 1e-4:
+         dist = 1e-4
+      dist2 = dist**2
+      
+      H = np.array([
+         [px_pred / dist,   py_pred / dist,   0],
+         [-py_pred / dist2, px_pred / dist2,  0]
+      ])
+      
+      S = H @ P_pred @ H.T + R
+      K = P_pred @ H.T @ np.linalg.inv(S)
+      
+      z_pred_val = np.array([dist, np.arctan2(py_pred, px_pred)])
+      z_meas = np.array([z_r[k+1], z_theta[k+1]])
+      
+      y_residual = z_meas - z_pred_val
+      y_residual[1] = np.arctan2(np.sin(y_residual[1]), np.cos(y_residual[1]))
+      
+      x_next = x_pred + K @ y_residual
+      P_next = (np.eye(n_states) - K @ H) @ P_pred
+      
+      # Store
+      x_est[k+1] = x_next
+      P = P_next
+      P_history[k+1] = np.diag(P)
+   
+   return P_history
+
+# Run three cases
+print("Running EKF for three different cases (DR Model)...")
+P_case1 = run_ekf_dr(q_pos=0.05, q_heading=0.005, case_name="Case 1: Low Q")
+P_case2 = run_ekf_dr(q_pos=0.1,  q_heading=0.01,  case_name="Case 2: Medium Q")
+P_case3 = run_ekf_dr(q_pos=0.3,  q_heading=0.03,  case_name="Case 3: High Q")
+print("Done!")
+
+# Visualization
+colors = ['blue', 'green', 'red']
+labels_cases = ['Case 1 (Low Q)', 'Case 2 (Medium Q)', 'Case 3 (High Q)']
+P_cases = [P_case1, P_case2, P_case3]
+
+plt.figure(figsize=(14, 10))
+
+# P_00 (Position X variance)
+plt.subplot(2, 2, 1)
+for P_hist, label, color in zip(P_cases, labels_cases, colors):
+   plt.plot(time, P_hist[:, 0], color=color, linewidth=2, label=label)
+plt.title('Covariance $P_{00}$ (Position X Variance)', fontsize=12, fontweight='bold')
+plt.xlabel('Time (s)')
+plt.ylabel('Variance ($m^2$)')
+plt.grid(True)
+plt.legend()
+plt.yscale('log')
+
+# P_11 (Position Y variance)
+plt.subplot(2, 2, 2)
+for P_hist, label, color in zip(P_cases, labels_cases, colors):
+   plt.plot(time, P_hist[:, 1], color=color, linewidth=2, label=label)
+plt.title('Covariance $P_{11}$ (Position Y Variance)', fontsize=12, fontweight='bold')
+plt.xlabel('Time (s)')
+plt.ylabel('Variance ($m^2$)')
+plt.grid(True)
+plt.legend()
+plt.yscale('log')
+
+# P_22 (Heading variance)
+plt.subplot(2, 2, 3)
+for P_hist, label, color in zip(P_cases, labels_cases, colors):
+   plt.plot(time, P_hist[:, 2], color=color, linewidth=2, label=label)
+plt.title('Covariance $P_{22}$ (Heading Variance)', fontsize=12, fontweight='bold')
+plt.xlabel('Time (s)')
+plt.ylabel('Variance ($rad^2$)')
+plt.grid(True)
+plt.legend()
+plt.yscale('log')
+
+plt.suptitle('Practice 3-4: Covariance Matrix P Comparison (DR Model)', 
+            fontsize=14, fontweight='bold')
+plt.tight_layout()
+plt.show()
+
+# Print final values
+print("\n" + "="*70)
+print("Practice 3-4: Final Covariance Values (at t=30s)")
+print("="*70)
+
+for i, (P_hist, label) in enumerate(zip(P_cases, labels_cases), 1):
+   print(f"\n{label}:")
+   print(f"  P_00 (Position X variance): {P_hist[-1, 0]:.6f} m²")
+   print(f"  P_11 (Position Y variance): {P_hist[-1, 1]:.6f} m²")
+   print(f"  P_22 (Heading variance)   : {P_hist[-1, 2]:.6f} rad²")
+
+print("\n" + "="*70)
