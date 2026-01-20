@@ -1148,3 +1148,11 @@ for i, (P_hist, label) in enumerate(zip(P_cases, labels_cases), 1):
    print(f"  P_22 (Heading variance)   : {P_hist[-1, 2]:.6f} rad²")
 
 print("\n" + "="*70)
+
+"""
+[Practice 3-5] 
+Please describe the performance difference between CV and Dead Reckoning Kalman
+filter!
+
+
+"""
