@@ -95,7 +95,6 @@ axes[1, 1].grid(True)
 axes[1, 1].axis('equal')
 
 plt.tight_layout()
-plt.savefig('practice_1_1_states.png', dpi=300)
 plt.show()
 
 # ============================================================================
@@ -105,7 +104,6 @@ plt.show()
 # Sensor noise: std_r = 1.0 m, std_theta = 3.0 deg
 # Measurement model: r = sqrt(x^2 + y^2) + noise_r
 #                    theta = atan2(y, x) + noise_theta
-# Output: Plot true vs noisy measurements, save to file
 # ============================================================================
 
 # Sensor noise standard deviations
@@ -144,7 +142,6 @@ axes[1].legend()
 axes[1].grid(True)
 
 plt.tight_layout()
-plt.savefig('practice_1_2_measurements.png', dpi=300)
 plt.show()
 
 # ============================================================================
@@ -345,7 +342,6 @@ axes[2, 1].set_title('Heading Error')
 axes[2, 1].grid(True)
 
 plt.tight_layout()
-plt.savefig('practice_2_1_estimation.png', dpi=300)
 plt.show()
 
 # Plot 2D trajectory comparison
@@ -361,7 +357,6 @@ ax.legend()
 ax.grid(True)
 ax.axis('equal')
 plt.tight_layout()
-plt.savefig('practice_2_1_trajectory.png', dpi=300)
 plt.show()
 
 # ============================================================================
