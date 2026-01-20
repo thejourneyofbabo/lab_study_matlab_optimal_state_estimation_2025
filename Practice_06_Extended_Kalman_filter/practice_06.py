@@ -1150,9 +1150,35 @@ for i, (P_hist, label) in enumerate(zip(P_cases, labels_cases), 1):
 print("\n" + "="*70)
 
 """
-[Practice 3-5] 
-Please describe the performance difference between CV and Dead Reckoning Kalman
-filter!
+-------------------------------------------------------------------------------
+Problem: Practice 3-5: Performance Comparison (CV vs DR Model)
+-------------------------------------------------------------------------------
 
+【모델 비교】
 
+1. CV Model (Constant Velocity):
+   - 상태: [x, y, vx, vy] (4차원)
+   - 가정: 등속 직선 운동
+   - 제어 입력: 사용 안함
+   - 문제: 회전 운동을 표현 못함 → 모델 불일치 큼
+
+2. DR Model (Dead Reckoning):
+   - 상태: [x, y, ψ] (3차원)
+   - 가정: 실제 차량 운동 모델
+   - 제어 입력: V(속도), ψ̇(각속도) 사용
+   - 장점: 회전 운동을 정확히 표현
+
+【성능 차이】
+
+DR 모델이 CV 모델보다 우수한 이유:
+1. 모델 정확도: 실제 움직임(회전 포함)과 일치
+2. 작은 Process Noise: 모델이 정확해서 작은 Q로 충분
+3. 낮은 RMSE: 위치 추정 오차가 30-50% 감소
+4. 빠른 수렴: 더 빠르게 안정화
+
+【결론】
+이 실험처럼 곡선 경로를 따라 움직이는 차량에서는 
+DR 모델이 CV 모델보다 훨씬 정확한 추정 제공.
+-------------------------------------------------------------------------------
 """
+
